@@ -1,7 +1,7 @@
 {
-  "name": "auth-block32",
-  "version": "0.0.1",
-  "description": "All in one auth nest js package",
+  "name": "@block32/jwt-auth",
+  "version": "1.0.0",
+  "description": "All-in-one JWT auth NestJS package. Inspired by @nestjs/jwt package.",
   "author": "Luka Vukotic",
   "private": true,
   "license": "UNLICENSED",
@@ -30,6 +30,7 @@
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.10.7",
     "@types/supertest": "^6.0.2",
     "eslint": "^9.18.0",
@@ -68,6 +69,7 @@
   },
   "dependencies": {
     "argon2": "^0.44.0",
-    "bcrypt": "^6.0.0"
+    "bcrypt": "^6.0.0",
+    "jsonwebtoken": "^9.0.3"
   }
 }

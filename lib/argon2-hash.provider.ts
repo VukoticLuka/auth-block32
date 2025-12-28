@@ -1,29 +1,30 @@
-import { Injectable } from '@nestjs/common';
-import { Argon2Options, HashProvider } from './interfaces';
 import * as argon2 from 'argon2';
+import { Argon2Options, HashProvider } from './interfaces';
+import { ARGON2_OPTIONS, Argon2Default } from './constants';
+import { Inject, Logger, Optional } from '@nestjs/common';
 
-@Injectable()
 export class Argon2Provider implements HashProvider {
-  // these are recommended values
-  private readonly recommendedOptions: Required<Argon2Options> = {
-    timeCost: 3,
-    memoryCost: 2 ** 16,
-    parallelism: 1,
-  };
-  private options: Required<Argon2Options>;
+  private readonly logger = new Logger(Argon2Provider.name);
 
-  constructor(argonOptions: Argon2Options = {}) {
-    this.options = {
-      ...this.recommendedOptions,
-      ...argonOptions,
-    };
-  }
+  constructor(
+    @Optional()
+    @Inject(ARGON2_OPTIONS)
+    private readonly argon2Options: Argon2Options = {},
+  ) {}
 
   async hash(data: string): Promise<string> {
-    return argon2.hash(data, this.options);
+    const options = this.getArgon2Options(this.argon2Options);
+    return argon2.hash(data, options);
   }
 
   async compare(data: string, encryptedData: string): Promise<boolean> {
     return argon2.verify(encryptedData, data);
+  }
+
+  private getArgon2Options(options?: Argon2Options): Argon2Options {
+    return {
+      ...Argon2Default,
+      ...options,
+    };
   }
 }
