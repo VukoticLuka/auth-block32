@@ -68,7 +68,7 @@ export class JwtModule {
       : {
           provide: JWT_OPTIONS,
           useFactory: async (factoryOptions: JwtModuleFactoryOptions) => {
-            await factoryOptions.createJwtModuleOptions();
+            return await factoryOptions.createJwtModuleOptions();
           },
           inject: [options.useClass || options.useExisting] as any[],
         };
