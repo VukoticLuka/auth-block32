@@ -8,10 +8,11 @@ import {
 import { JWT_OPTIONS } from './constants';
 import { CreateAsyncJwtProvidersError } from './jwt.errors';
 import { createJwtBlock32Provider } from './jwt.providers';
+import { TokenService } from './token.service';
 
 @Module({
-  providers: [JwtAsyncService],
-  exports: [JwtAsyncService],
+  providers: [JwtAsyncService, TokenService],
+  exports: [JwtAsyncService, TokenService],
 })
 export class JwtModule {
   private static readonly logger = new Logger('JwtModule');
