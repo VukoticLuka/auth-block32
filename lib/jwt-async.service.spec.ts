@@ -74,7 +74,7 @@ describe('Test jwt flow without mocks', () => {
     jwtService = await serviceSetup(options);
   });
 
-  let testData = {
+  const testData = {
     stringPayload: 'test',
     bufferPayload: Buffer.from('TestData', 'base64'),
   };
@@ -207,14 +207,14 @@ describe('JwtAsyncService tests with mocks', () => {
       privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
     });
 
-    let testData = {
+    const testData = {
       test: 'testValue',
     };
 
     beforeAll(async () => {
-      let privateKeyMock: KeyObject = createPrivateKey(privateKey);
-      let publicKeyMock: KeyObject = createPublicKey(publicKey);
-      let mockOptions: JwtBlock32Options = {
+      const privateKeyMock: KeyObject = createPrivateKey(privateKey);
+      const publicKeyMock: KeyObject = createPublicKey(publicKey);
+      const mockOptions: JwtBlock32Options = {
         accessToken: {
           ...accessTokenOptions,
           keyOptions: {
