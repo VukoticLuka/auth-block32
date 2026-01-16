@@ -16,9 +16,10 @@ import {
 } from './interfaces';
 import { RefreshTokenError } from './jwt.errors';
 import { RefreshCookieOptions } from './interfaces/core-options.interface';
+import { TokenStorageDomain } from './domains';
 
 @Injectable()
-export class TokenService {
+export class TokenService implements TokenStorageDomain {
   private readonly logger = new Logger(TokenService.name);
 
   constructor(
