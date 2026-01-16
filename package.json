@@ -9,11 +9,11 @@
     "build": "rm -rf dist && tsc -p tsconfig.json",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "format:fix": "prettier --write -u \"**/*.ts\"",
-    "lint": "eslint \"{src,apps,lib,test}/**/*.ts\" --fix",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "lint": "eslint \"{src,apps,lib,test}/**/*.ts\"",
+    "lint:fix": "eslint \"{src,apps,lib,test}/**/*.ts\" --fix",
+    "test": "jest --config=jest.config.json",
+    "test:watch": "jest --config=jest.config.json --watch",
+    "test:cov": "jest --config=jest.config.json --coverage",
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "devDependencies": {
