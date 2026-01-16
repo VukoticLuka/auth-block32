@@ -42,7 +42,7 @@ export class JwtAsyncService implements JwtAsyncDomain {
     payload: T,
     options: CoreTokenOptions,
   ): Promise<string> {
-    const secret = await this.getSecretValue(
+    const secret = await this.getSecretOrKey(
       options.keyOptions,
       payload,
       RequestType.SIGN,
@@ -79,7 +79,7 @@ export class JwtAsyncService implements JwtAsyncDomain {
     token: string,
     options: CoreTokenOptions,
   ): Promise<T> {
-    const secret = await this.getSecretValue(
+    const secret = await this.getSecretOrKey(
       options.keyOptions,
       token,
       RequestType.VERIFY,
@@ -110,7 +110,7 @@ export class JwtAsyncService implements JwtAsyncDomain {
     return jwt.decode(token, options);
   }
 
-  private getSecretValue(
+  private getSecretOrKey(
     keyOptions: KeyOptions,
     tokenOrPayload: string | object | Buffer,
     requestType: RequestType,

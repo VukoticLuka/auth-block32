@@ -1,5 +1,15 @@
 import * as jwt from 'jsonwebtoken';
 
+export enum RequestType {
+  SIGN = 'sign',
+  VERIFY = 'verify',
+}
+
+export enum TokenType {
+  ACCESS = 'access',
+  REFRESH = 'refresh',
+}
+
 export type CoreCookieOptions = {
   cookieName: string;
   httpOnly: boolean;
@@ -39,13 +49,3 @@ export type KeyOptions = {
 };
 
 export type GetSecretValue = jwt.Secret | Promise<jwt.Secret>;
-
-export enum RequestType {
-  SIGN = 'sign',
-  VERIFY = 'verify',
-}
-
-export enum TokenType {
-  ACCESS = 'access',
-  REFRESH = 'refresh',
-}

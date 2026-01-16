@@ -51,6 +51,7 @@ const refreshTokenOptions: RefreshTokenOptions = {
     cookieName: 'RefreshToken',
     secure: true,
     path: '/',
+    // max age her is 20 days
     maxAge: 1000 * 60 * 60 * 24 * 20,
   },
 };
@@ -94,6 +95,8 @@ describe('Test jwt flow without mocks', () => {
       data: testData.stringPayload,
     });
 
+    // you should never pass payload of type Buffer this was just for testing
+
     token = await jwtService.signAccessAsync({ data: testData.bufferPayload });
     expect(token).toBeDefined();
 
@@ -110,13 +113,13 @@ describe('JwtAsyncService tests with mocks', () => {
   beforeEach(() => {
     signSpy = jest
       .spyOn(jwt, 'sign')
-      .mockImplementation((payload: string, secret: any, options, callback) => {
+      .mockImplementation((payload: string, secret: any, _, callback) => {
         const mockResult = payload + '_' + (secret as string);
         return callback ? callback(null, mockResult) : mockResult;
       });
     verifySpy = jest
       .spyOn(jwt, 'verify')
-      .mockImplementation((token, secret, options, callback) => {
+      .mockImplementation((token, secret, _, callback) => {
         const mockResult = token + '_' + (secret as string);
         return callback ? callback(null, mockResult) : mockResult;
       });
@@ -164,7 +167,7 @@ describe('JwtAsyncService tests with mocks', () => {
           ...accessTokenOptions,
           keyOptions: {
             algorithm: 'HS256',
-            secret: null as any,
+            secret: undefined,
           },
         },
       };
@@ -201,6 +204,7 @@ describe('JwtAsyncService tests with mocks', () => {
 
   describe('Test JwtAsyncService accessToken for private/public keys', () => {
     let jwtService: JwtAsyncService;
+    // we are mul 384 by 8 because 1 byte is 8 bits
     const { privateKey, publicKey } = generateKeyPairSync('rsa', {
       modulusLength: 384 * 8,
       publicKeyEncoding: { type: 'spki', format: 'pem' },
@@ -241,6 +245,34 @@ describe('JwtAsyncService tests with mocks', () => {
       await expect(jwtService.verifyAccessAsync(token)).resolves.toHaveProperty(
         'test',
         'testValue',
+      );
+    });
+  });
+
+  describe('Test JwtAsyncService accessToken flow when secret is Buffer', () => {
+    let jwtService: JwtAsyncService;
+    const newSecret: Buffer = Buffer.from('access_secret', 'utf-8');
+    const mockOptions: JwtBlock32Options = {
+      accessToken: {
+        ...accessTokenOptions,
+        keyOptions: {
+          algorithm: 'HS256',
+          secret: newSecret,
+        },
+      },
+    };
+
+    beforeAll(async () => {
+      jwtService = await serviceSetup(mockOptions);
+    });
+
+    it('test access token sign and verify flow', async () => {
+      const token = await jwtService.signAccessAsync('test_data');
+
+      expect(token).toBeDefined();
+
+      await expect(jwtService.verifyAccessAsync(token)).resolves.toContain(
+        'test_data_access_secret',
       );
     });
   });

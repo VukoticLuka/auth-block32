@@ -44,19 +44,21 @@ export class JwtModule {
   private static createAsyncJwtProviders(
     options: JwtModuleOptionsAsync,
   ): Provider[] {
-    if(!options.useClass && !options.useExisting && !options.useFactory) {
-        this.logger.error(
+    if (!options.useClass && !options.useExisting && !options.useFactory) {
+      this.logger.error(
         'Error while creating async providers. None of these 3 arguments are provided: useFactory, useClass and useExisting',
       );
       throw new CreateAsyncJwtProvidersError();
     }
 
-    const providers: Provider[] = [this.createProviderFromAsyncOptions(options)];
-    if(options.useClass) {
-        providers.push({
-            provide: options.useClass,
-            useClass: options.useClass
-        });
+    const providers: Provider[] = [
+      this.createProviderFromAsyncOptions(options),
+    ];
+    if (options.useClass) {
+      providers.push({
+        provide: options.useClass,
+        useClass: options.useClass,
+      });
     }
 
     return providers;
