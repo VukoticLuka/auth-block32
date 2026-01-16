@@ -9,10 +9,16 @@ import { JWT_OPTIONS } from './constants';
 import { CreateAsyncJwtProvidersError } from './jwt.errors';
 import { createJwtBlock32Provider } from './jwt.providers';
 import { TokenService } from './token.service';
+import { JwtSyncService } from './jwt-sync.service';
 
+/*
+ * We are not lazy-loading services because they are lightweight.
+ * They only store options in their constructors, which is not CPU-intensive.
+ * In the future, if we decide to extend this library, we may include lazy loading.
+ */
 @Module({
-  providers: [JwtAsyncService, TokenService],
-  exports: [JwtAsyncService, TokenService],
+  providers: [JwtAsyncService, JwtSyncService, TokenService],
+  exports: [JwtAsyncService, JwtSyncService, TokenService],
 })
 export class JwtModule {
   private static readonly logger = new Logger('JwtModule');
@@ -38,22 +44,22 @@ export class JwtModule {
   private static createAsyncJwtProviders(
     options: JwtModuleOptionsAsync,
   ): Provider[] {
-    if (options.useFactory) {
-      return [
-        this.createProviderFromAsyncOptions(options),
-        {
-          provide: options.useClass,
-          useClass: options.useClass,
-        } as any,
-      ];
-    } else if (options.useClass || options.useExisting) {
-      return [this.createProviderFromAsyncOptions(options)];
-    } else {
-      this.logger.error(
+    if(!options.useClass && !options.useExisting && !options.useFactory) {
+        this.logger.error(
         'Error while creating async providers. None of these 3 arguments are provided: useFactory, useClass and useExisting',
       );
       throw new CreateAsyncJwtProvidersError();
     }
+
+    const providers: Provider[] = [this.createProviderFromAsyncOptions(options)];
+    if(options.useClass) {
+        providers.push({
+            provide: options.useClass,
+            useClass: options.useClass
+        });
+    }
+
+    return providers;
   }
 
   private static createProviderFromAsyncOptions(
