@@ -9,7 +9,7 @@
     "build": "rm -rf dist && tsc -p tsconfig.json",
     "format": "prettier --write \"lib/**/*.ts\" \"test/**/*.ts\"",
     "format:fix": "prettier --write -u \"**/*.ts\"",
-    "lint": "eslint \"{src,lib,test}/**/*.ts\"",
+    "lint": "eslint \"lib/**/*.ts\"",
     "lint:fix": "eslint \"{src,apps,lib,test}/**/*.ts\" --fix",
     "test": "jest --config=jest.config.json",
     "test:watch": "jest --config=jest.config.json --watch",
@@ -30,7 +30,6 @@
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",
-    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.10.7",
     "@types/supertest": "^6.0.2",
     "eslint": "^9.18.0",
@@ -70,6 +69,7 @@
   "dependencies": {
     "argon2": "^0.44.0",
     "bcrypt": "^6.0.0",
-    "jsonwebtoken": "^9.0.3"
+    "jsonwebtoken": "^9.0.3",
+    "@types/jsonwebtoken": "^9.0.10"
   }
 }
