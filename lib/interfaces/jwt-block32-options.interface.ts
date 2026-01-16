@@ -4,17 +4,8 @@ import {
   CoreHeaderOptions,
   RefreshCookieOptions,
   KeyOptions,
+  TokenType,
 } from './core-options.interface';
-
-export enum RequestType {
-  SIGN = 'sign',
-  VERIFY = 'verify',
-}
-
-export enum TokenType {
-  ACCESS = 'access',
-  REFRESH = 'refresh',
-}
 
 export type TokenOptionsMap = {
   [TokenType.ACCESS]: AccessTokenOptions;

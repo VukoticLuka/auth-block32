@@ -9,6 +9,10 @@ import {
 } from './interfaces';
 import { RefreshTokenError, SecretKeyError } from './jwt.errors';
 import * as jwt from 'jsonwebtoken';
+import {
+  GetSecretValue,
+  KeyOptions,
+} from './interfaces/core-options.interface';
 
 @Injectable()
 export class JwtAsyncService implements JwtAsyncDomain {
@@ -34,11 +38,16 @@ export class JwtAsyncService implements JwtAsyncDomain {
     return this.signAsync(payload, options);
   }
 
-  signAsync<T extends object | string | Buffer>(
+  private async signAsync<T extends object | string | Buffer>(
     payload: T,
     options: CoreTokenOptions,
   ): Promise<string> {
-    const secret = this.getSecretValue(options, RequestType.SIGN);
+    const secret = await this.getSecretValue(
+      options.keyOptions,
+      payload,
+      RequestType.SIGN,
+      options.signOptions || {},
+    );
     return new Promise((resolve, reject) => {
       jwt.sign(
         payload,
@@ -66,11 +75,16 @@ export class JwtAsyncService implements JwtAsyncDomain {
     return this.verifyAsync(token, options);
   }
 
-  verifyAsync<T extends object>(
+  private async verifyAsync<T extends object>(
     token: string,
     options: CoreTokenOptions,
   ): Promise<T> {
-    const secret = this.getSecretValue(options, RequestType.VERIFY);
+    const secret = await this.getSecretValue(
+      options.keyOptions,
+      token,
+      RequestType.VERIFY,
+      options.verifyOptions || {},
+    );
 
     return new Promise((resolve, reject) => {
       jwt.verify(
@@ -82,8 +96,7 @@ export class JwtAsyncService implements JwtAsyncDomain {
         },
         (err, payload) => {
           if (err) return reject(err);
-          if (!payload)
-            return reject(new Error('Token failed to be verified!'));
+          if (!payload) return reject(new Error('Token failed to be verified'));
           resolve(payload as T);
         },
       );
@@ -98,16 +111,23 @@ export class JwtAsyncService implements JwtAsyncDomain {
   }
 
   private getSecretValue(
-    options: CoreTokenOptions,
+    keyOptions: KeyOptions,
+    tokenOrPayload: string | object | Buffer,
     requestType: RequestType,
-  ): jwt.Secret {
+    requestTypeOptions: jwt.SignOptions | jwt.VerifyOptions,
+  ): GetSecretValue {
     const keyMap: Record<RequestType, 'privateKey' | 'publicKey'> = {
       [RequestType.SIGN]: 'privateKey',
       [RequestType.VERIFY]: 'publicKey',
     };
 
-    const secret =
-      options?.keyOptions?.secret ?? options?.keyOptions?.[keyMap[requestType]];
+    const secret = keyOptions.secretOrKeyProvider
+      ? keyOptions.secretOrKeyProvider(
+          requestType,
+          tokenOrPayload,
+          requestTypeOptions,
+        )
+      : (keyOptions?.secret ?? keyOptions?.[keyMap[requestType]]);
 
     if (!secret) {
       this.logger.error(

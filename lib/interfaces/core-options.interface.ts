@@ -31,6 +31,21 @@ export type KeyOptions = {
   secret?: jwt.Secret;
   privateKey?: jwt.Secret;
   publicKey?: jwt.Secret;
+  secretOrKeyProvider?: (
+    requestType: RequestType,
+    tokenOrPayload: string | object | Buffer,
+    requestOptions: jwt.SignOptions | jwt.VerifyOptions,
+  ) => GetSecretValue;
 };
 
 export type GetSecretValue = jwt.Secret | Promise<jwt.Secret>;
+
+export enum RequestType {
+  SIGN = 'sign',
+  VERIFY = 'verify',
+}
+
+export enum TokenType {
+  ACCESS = 'access',
+  REFRESH = 'refresh',
+}
