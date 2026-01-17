@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.json",
-    "format": "prettier --write \"lib/**/*.ts\" \"test/**/*.ts\"",
+    "format": "prettier --check \"lib/**/*.ts\" \"test/**/*.ts\"",
     "format:fix": "prettier --write -u \"**/*.ts\"",
     "lint": "eslint \"lib/**/*.ts\"",
     "lint:fix": "eslint \"{src,apps,lib,test}/**/*.ts\" --fix",
@@ -25,6 +25,7 @@
     "jsonwebtoken": "^9.0.3"
   },
   "devDependencies": {
+    "@arkweid/lefthook": "^0.7.7",
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
     "@nestjs/cli": "^11.0.0",

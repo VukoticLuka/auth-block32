@@ -1,0 +1,11 @@
+pre-push:
+  parallel: false
+  commands:
+    test:
+      run: npm run test
+    format-fix:
+      run: npm run format:fix
+pre-commit:
+  commands:
+    format:
+      run: npm run format
