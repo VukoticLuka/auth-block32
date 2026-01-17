@@ -6,15 +6,21 @@ import {
   DEFAULT_REFRESH_COOKIE_NAME,
   JWT_OPTIONS,
 } from './constants';
-import { Response } from 'express';
 import {
   JwtBlock32Options,
   TokenType,
   TokenOptionsMap,
   HeaderStorageOptions,
   CookieStorageOptions,
+  HttpRequest,
+  HttpResponse,
 } from './interfaces';
-import { RefreshTokenError } from './jwt.errors';
+import {
+  EmptyCookieError,
+  RefreshTokenError,
+  UndefinedCookieRequestError,
+  WrongAuthHeaderTypeError,
+} from './jwt.errors';
 import { RefreshCookieOptions } from './interfaces/core-options.interface';
 import { TokenStorageDomain } from './domains';
 
@@ -27,7 +33,7 @@ export class TokenService implements TokenStorageDomain {
     private readonly jwtOptions: JwtBlock32Options,
   ) {}
 
-  setAccessTokenToStorage(res: Response, token: string): void {
+  setAccessTokenToStorage(res: HttpResponse, token: string): void {
     const tokenOptions = this.getTokenOptions(TokenType.ACCESS);
     if (tokenOptions.storage === 'header') {
       const options = tokenOptions as HeaderStorageOptions;
@@ -45,13 +51,75 @@ export class TokenService implements TokenStorageDomain {
     }
   }
 
-  setRefreshTokenToStorage(res: Response, token: string): void {
+  setRefreshTokenToStorage(res: HttpResponse, token: string): void {
     const refreshTokenOptions = this.getTokenOptions(TokenType.REFRESH);
     const { cookieName, ...coreOptions } =
       refreshTokenOptions.cookieOptions as RefreshCookieOptions;
     res.cookie(cookieName ?? DEFAULT_REFRESH_COOKIE_NAME, token, {
       ...coreOptions,
     });
+  }
+
+  getAccessTokenFromStorage(req: HttpRequest): string | undefined {
+    const tokenOptions = this.getTokenOptions(TokenType.ACCESS);
+    if (tokenOptions.storage === 'header') {
+      const headerName =
+        tokenOptions.headerOptions.headerName ||
+        DEFAULT_HEADER_NAME.toLocaleLowerCase();
+      const header = req.headers[headerName];
+      if (typeof header !== 'string') {
+        throw new WrongAuthHeaderTypeError('Missing authorization header');
+      }
+
+      const token = header.split(' ')[1];
+      if (!token) {
+        throw new UndefinedCookieRequestError(
+          'Cookies do not exist for provided HttpRequest object',
+        );
+      }
+
+      return token;
+    } else if (tokenOptions.storage === 'cookie') {
+      const cookieName =
+        tokenOptions.cookieOptions.cookieName || DEFAULT_ACCESS_COOKIE_NAME;
+      if (!req.cookies) {
+        throw new UndefinedCookieRequestError(
+          'Cookies do not exist for provided HttpRequest object',
+        );
+      }
+
+      const token = req.cookies[cookieName];
+
+      if (!token) {
+        throw new EmptyCookieError(
+          `Cookie ${cookieName} has empty or undefined value`,
+        );
+      }
+
+      return token;
+    }
+  }
+
+  getRefreshTokenFromStorage(req: HttpRequest): string | undefined {
+    const tokenOptions = this.getTokenOptions(TokenType.REFRESH);
+    const cookieName =
+      tokenOptions.cookieOptions?.cookieName || DEFAULT_REFRESH_COOKIE_NAME;
+
+    if (!req.cookies) {
+      throw new UndefinedCookieRequestError(
+        'Cookies do not exist for provided HttpRequest object',
+      );
+    }
+
+    const token = req.cookies[cookieName];
+
+    if (!token) {
+      throw new EmptyCookieError(
+        `Cookie ${cookieName} has empty or undefined value`,
+      );
+    }
+
+    return token;
   }
 
   private getTokenOptions<T extends TokenType>(

@@ -10,6 +10,8 @@ import { CreateAsyncJwtProvidersError } from './jwt.errors';
 import { createJwtBlock32Provider } from './jwt.providers';
 import { TokenService } from './token.service';
 import { JwtSyncService } from './jwt-sync.service';
+import { JwtSyncGuard } from './jwtSync.guard';
+import { JwtAsyncGuard } from './jwtAsync.guard';
 
 /*
  * We are not lazy-loading services because they are lightweight.
@@ -17,8 +19,20 @@ import { JwtSyncService } from './jwt-sync.service';
  * In the future, if we decide to extend this library, we may include lazy loading.
  */
 @Module({
-  providers: [JwtAsyncService, JwtSyncService, TokenService],
-  exports: [JwtAsyncService, JwtSyncService, TokenService],
+  providers: [
+    JwtAsyncService,
+    JwtSyncService,
+    TokenService,
+    JwtAsyncGuard,
+    JwtSyncGuard,
+  ],
+  exports: [
+    JwtAsyncService,
+    JwtSyncService,
+    TokenService,
+    JwtAsyncGuard,
+    JwtSyncGuard,
+  ],
 })
 export class JwtModule {
   private static readonly logger = new Logger('JwtModule');

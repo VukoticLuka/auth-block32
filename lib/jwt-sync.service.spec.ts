@@ -200,7 +200,7 @@ describe('JwtAsyncService tests with mocks', () => {
 
   describe('Test JwtAsyncService accessToken for private/public keys', () => {
     let jwtService: JwtSyncService;
-    // we are mul 384 by 8 because 1 byte is 8 bits
+    // we are multiplying 384 by 8 because 1 byte is 8 bits
     const { privateKey, publicKey } = generateKeyPairSync('rsa', {
       modulusLength: 384 * 8,
       publicKeyEncoding: { type: 'spki', format: 'pem' },
