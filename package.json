@@ -1,10 +1,24 @@
 {
-  "name": "@block32/jwt-auth",
+  "name": "@block32/jwt",
   "version": "1.0.0",
-  "description": "All-in-one JWT auth NestJS package. Inspired by @nestjs/jwt package.",
+  "description": "A fully typed JWT authentication package for NestJS, inspired by @nestjs/jwt.",
   "author": "Luka Vukotic",
-  "private": true,
   "license": "MIT",
+  "main": "./index.js",
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "index.js",
+    "index.d.ts",
+    "LICENSE.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VukoticLuka/jwt-block32"
+  },
+  "bugs": {
+    "url": "https://github.com/VukoticLuka/jwt-block32/issues"
+  },
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "format": "prettier --check \"**/*.ts\"",
@@ -14,7 +28,9 @@
     "test": "jest --config=jest.config.json",
     "test:watch": "jest --config=jest.config.json --watch",
     "test:cov": "jest --config=jest.config.json --coverage",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "local:link": "npm link",
+    "prepublish": "npm run build",
+    "publish": "npm publish --access public"
   },
   "peerDependencies": {
     "@nestjs/common": "^11.0.1"
