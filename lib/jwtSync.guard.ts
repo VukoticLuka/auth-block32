@@ -7,6 +7,7 @@ import {
 import { TokenService } from './token.service';
 import { JwtSyncService } from './jwt-sync.service';
 import { UndefinedTokenError } from './jwt.errors';
+import { HttpRequest } from './interfaces';
 
 @Injectable()
 export class JwtSyncGuard implements CanActivate {
@@ -16,8 +17,8 @@ export class JwtSyncGuard implements CanActivate {
     private readonly tokenService: TokenService,
     private readonly jwtSyncService: JwtSyncService,
   ) {}
-  canActivate(context: ExecutionContext): boolean | Promise<boolean> {
-    const req = context.switchToHttp().getRequest();
+  canActivate(context: ExecutionContext): boolean {
+    const req: HttpRequest = context.switchToHttp().getRequest();
     try {
       const token = this.tokenService.getAccessTokenFromStorage(req);
       if (!token) {

@@ -7,6 +7,7 @@ import {
 import { TokenService } from './token.service';
 import { JwtAsyncService } from './jwt-async.service';
 import { UndefinedTokenError } from './jwt.errors';
+import { HttpRequest } from './interfaces';
 
 @Injectable()
 export class JwtAsyncGuard implements CanActivate {
@@ -17,7 +18,7 @@ export class JwtAsyncGuard implements CanActivate {
     private readonly jwtAsyncService: JwtAsyncService,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const req = context.switchToHttp().getRequest();
+    const req: HttpRequest = context.switchToHttp().getRequest();
     try {
       const token = this.tokenService.getAccessTokenFromStorage(req);
       if (!token) {

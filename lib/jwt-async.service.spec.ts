@@ -4,6 +4,7 @@ import {
   AccessTokenOptions,
   JwtBlock32Options,
   RefreshTokenOptions,
+  RequestType,
 } from './interfaces';
 import {
   createPrivateKey,
@@ -275,5 +276,45 @@ describe('JwtAsyncService tests with mocks', () => {
         'test_data_access_secret',
       );
     });
+  });
+});
+
+describe('Test JwtAsyncService when secretOrKey fn is provided', () => {
+  let jwtService: JwtAsyncService;
+  const { privateKey, publicKey } = generateKeyPairSync('rsa', {
+    modulusLength: 256 * 8,
+    publicKeyEncoding: { type: 'spki', format: 'pem' },
+    privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
+  });
+  const mockOptions: JwtBlock32Options = {
+    accessToken: {
+      ...accessTokenOptions,
+      keyOptions: {
+        algorithm: 'RS256',
+        secretOrKeyProvider(requestType: RequestType) {
+          return requestType === RequestType.SIGN ? privateKey : publicKey;
+        },
+        secret: 'test_secret',
+      },
+    },
+  };
+
+  const mockPayload = {
+    sub: 'test_user',
+    role: 'user',
+  };
+
+  beforeAll(async () => {
+    jwtService = await serviceSetup(mockOptions);
+  });
+
+  it('test flow with secretOrKeyProvider', async () => {
+    const token = await jwtService.signAccessAsync(mockPayload);
+    expect(token).toBeDefined();
+    expect(typeof token).toBe('string');
+
+    await expect(jwtService.verifyAccessAsync(token)).resolves.toMatchObject(
+      mockPayload,
+    );
   });
 });

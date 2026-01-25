@@ -3,6 +3,7 @@ import {
   AccessTokenOptions,
   JwtBlock32Options,
   RefreshTokenOptions,
+  RequestType,
 } from './interfaces';
 import {
   createPrivateKey,
@@ -128,7 +129,7 @@ describe('Test jwt flow without mocks when module is async loaded', () => {
   });
 });
 
-describe('JwtAsyncService tests with mocks', () => {
+describe('JwtSyncService tests with mocks', () => {
   let signSpy: jest.SpyInstance;
   let verifySpy: jest.SpyInstance;
 
@@ -152,7 +153,7 @@ describe('JwtAsyncService tests with mocks', () => {
     verifySpy.mockRestore();
   });
 
-  describe('Test JwtAsyncService when secret is provided', () => {
+  describe('Test JwtSyncService when secret is provided', () => {
     let jwtService: JwtSyncService;
 
     beforeEach(async () => {
@@ -198,7 +199,7 @@ describe('JwtAsyncService tests with mocks', () => {
     });
   });
 
-  describe('Test JwtAsyncService accessToken for private/public keys', () => {
+  describe('Test JwtSyncService accessToken for private/public keys', () => {
     let jwtService: JwtSyncService;
     // we are multiplying 384 by 8 because 1 byte is 8 bits
     const { privateKey, publicKey } = generateKeyPairSync('rsa', {
@@ -245,7 +246,7 @@ describe('JwtAsyncService tests with mocks', () => {
     });
   });
 
-  describe('Test JwtAsyncService accessToken flow when secret is Buffer', () => {
+  describe('Test JwtSyncService accessToken flow when secret is Buffer', () => {
     let jwtService: JwtSyncService;
     const newSecret: Buffer = Buffer.from('access_secret', 'utf-8');
     const mockOptions: JwtBlock32Options = {
@@ -271,5 +272,43 @@ describe('JwtAsyncService tests with mocks', () => {
         'test_data_access_secret',
       );
     });
+  });
+});
+
+describe('Test JwtSyncService when secretOrKey fn is provided', () => {
+  let jwtService: JwtSyncService;
+  const { privateKey, publicKey } = generateKeyPairSync('rsa', {
+    modulusLength: 256 * 8,
+    publicKeyEncoding: { type: 'spki', format: 'pem' },
+    privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
+  });
+  const mockOptions: JwtBlock32Options = {
+    accessToken: {
+      ...accessTokenOptions,
+      keyOptions: {
+        algorithm: 'RS256',
+        secretOrKeyProvider(requestType: RequestType) {
+          return requestType === RequestType.SIGN ? privateKey : publicKey;
+        },
+        secret: 'test_secret',
+      },
+    },
+  };
+
+  const mockPayload = {
+    sub: 'test_user',
+    role: 'user',
+  };
+
+  beforeAll(async () => {
+    jwtService = await serviceSetup(mockOptions);
+  });
+
+  it('test flow with secretOrKeyProvider', () => {
+    const token = jwtService.signAccessSync(mockPayload);
+    expect(token).toBeDefined();
+    expect(typeof token).toBe('string');
+
+    expect(jwtService.verifyAccessSync(token)).toMatchObject(mockPayload);
   });
 });
