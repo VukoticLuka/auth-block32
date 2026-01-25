@@ -40,7 +40,7 @@ export class TokenService implements TokenStorageDomain {
       const prefix = options.headerOptions.prefix ?? DEFAULT_HEADER_PREFIX;
       res.setHeader(
         options.headerOptions.headerName ?? DEFAULT_HEADER_NAME,
-        `${prefix}${token}`,
+        `${prefix} ${token}`,
       );
     } else if (tokenOptions.storage === 'cookie') {
       const options = tokenOptions as CookieStorageOptions;
@@ -71,7 +71,7 @@ export class TokenService implements TokenStorageDomain {
         throw new WrongAuthHeaderTypeError('Missing authorization header');
       }
 
-      const token = header.split(' ')[1];
+      const token = header.split(' ')[1].trim();
       if (!token) {
         throw new UndefinedCookieRequestError(
           'Cookies do not exist for provided HttpRequest object',
@@ -111,7 +111,7 @@ export class TokenService implements TokenStorageDomain {
       );
     }
 
-    const token = req.cookies[cookieName];
+    const token = req.cookies[cookieName].trim();
 
     if (!token) {
       throw new EmptyCookieError(
