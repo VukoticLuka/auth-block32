@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "rm -rf dist && tsc -p tsconfig.json",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "format": "prettier --check \"**/*.ts\"",
     "format:fix": "prettier --write -u \"**/*.ts\"",
     "lint": "eslint \"lib/**/*.ts\"",
