@@ -10,8 +10,8 @@ import { CreateAsyncJwtProvidersError } from './jwt.errors';
 import { createJwtBlock32Provider } from './jwt.providers';
 import { TokenService } from './token.service';
 import { JwtSyncService } from './jwt-sync.service';
-import { JwtSyncGuard } from './jwtSync.guard';
-import { JwtAsyncGuard } from './jwtAsync.guard';
+import { JwtSyncGuard } from './guards/jwtSync.guard';
+import { JwtAsyncGuard } from './guards/jwtAsync.guard';
 
 /*
  * We are not lazy-loading services because they are lightweight.

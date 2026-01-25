@@ -1,15 +1,15 @@
 import { Test } from '@nestjs/testing';
-import { JwtSyncGuard } from './jwtSync.guard';
-import { TokenService } from './token.service';
-import { JwtSyncService } from './jwt-sync.service';
+import { JwtAsyncGuard } from './jwtAsync.guard';
+import { TokenService } from '../token.service';
+import { JwtAsyncService } from '../jwt-async.service';
 import {
   AccessTokenOptions,
   HttpRequest,
   HttpResponse,
   JwtBlock32Options,
   RefreshTokenOptions,
-} from './interfaces';
-import { JwtModule } from './jwt.module';
+} from '../interfaces';
+import { JwtModule } from '../jwt.module';
 import { ExecutionContext } from '@nestjs/common';
 
 const accessTokenOptions: AccessTokenOptions = {
@@ -63,18 +63,18 @@ type MockHttpState = {
 };
 
 describe('Test jwtAsyncGuard', () => {
-  let guard: JwtSyncGuard;
+  let guard: JwtAsyncGuard;
   let tokenService: TokenService;
-  let jwtService: JwtSyncService;
+  let jwtService: JwtAsyncService;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       imports: [JwtModule.forRoot(options)],
     }).compile();
 
-    guard = module.get<JwtSyncGuard>(JwtSyncGuard);
+    guard = module.get<JwtAsyncGuard>(JwtAsyncGuard);
     tokenService = module.get<TokenService>(TokenService);
-    jwtService = module.get<JwtSyncService>(JwtSyncService);
+    jwtService = module.get<JwtAsyncService>(JwtAsyncService);
   });
 
   const mockExecutionContext = (req: HttpRequest): ExecutionContext =>
@@ -103,8 +103,8 @@ describe('Test jwtAsyncGuard', () => {
     email: 'test@example.com',
   };
 
-  it('should return true when access token is there and false when its not', () => {
-    const token = jwtService.signAccessSync(payload);
+  it('should return true when access token is there and false when its not', async () => {
+    const token = await jwtService.signAccessAsync(payload);
 
     expect(typeof token).toBe('string');
 
@@ -117,7 +117,7 @@ describe('Test jwtAsyncGuard', () => {
 
     let context = mockExecutionContext(req);
 
-    const result = guard.canActivate(context);
+    const result = await guard.canActivate(context);
 
     expect(result).toBe(true);
 
@@ -127,10 +127,10 @@ describe('Test jwtAsyncGuard', () => {
 
     context = mockExecutionContext(badReq);
 
-    expect(guard.canActivate(context)).toBe(false);
+    await expect(guard.canActivate(context)).resolves.toBe(false);
   });
 
-  it('test guard with using token service', () => {
+  it('test guard with using token service', async () => {
     const createMockHttp = () => {
       const state: MockHttpState = {
         headers: {},
@@ -146,12 +146,12 @@ describe('Test jwtAsyncGuard', () => {
 
     const { req, res } = createMockHttp();
 
-    const token = jwtService.signAccessSync(payload);
+    const token = await jwtService.signAccessAsync(payload);
 
     tokenService.setAccessTokenToStorage(res, token);
 
     const context = mockExecutionContext(req);
 
-    expect(guard.canActivate(context)).toBe(true);
+    await expect(guard.canActivate(context)).resolves.toBe(true);
   });
 });
