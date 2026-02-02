@@ -28,12 +28,12 @@ If you’d like to contribute, feel free to open **Pull Requests** or **Issues**
 ## Installation
 
 ```bash
-npm install @block32/jwt
+npm install block32-jwt
 ```
 
 ## Usage
 
-@block32/jwt package comes with multiple services.
+block32-jwt package comes with multiple services.
 
 Import `JwtModule`:
 
@@ -117,4 +117,4 @@ export class ExampleService {
 
 ## License
 
-@block32/jwt is [MIT licensed](LICENSE.md).
+block32-jwt is [MIT licensed](LICENSE.md).
