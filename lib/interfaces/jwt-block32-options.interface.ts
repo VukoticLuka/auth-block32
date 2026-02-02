@@ -14,12 +14,12 @@ export type TokenOptionsMap = {
 
 export type CookieStorageOptions = {
   storage: 'cookie';
-  cookieOptions: Partial<CoreCookieOptions>;
+  cookieOptions?: Partial<CoreCookieOptions>;
 };
 
 export type HeaderStorageOptions = {
   storage: 'header';
-  headerOptions: Partial<CoreHeaderOptions>;
+  headerOptions?: Partial<CoreHeaderOptions>;
 };
 export type SignOptions = Omit<jwt.SignOptions, 'algorithm'>;
 export type VerifyOptions = Omit<jwt.VerifyOptions, 'algorithm'>;

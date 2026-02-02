@@ -37,14 +37,16 @@ export class TokenService implements TokenStorageDomain {
     const tokenOptions = this.getTokenOptions(TokenType.ACCESS);
     if (tokenOptions.storage === 'header') {
       const options = tokenOptions as HeaderStorageOptions;
-      const prefix = options.headerOptions.prefix ?? DEFAULT_HEADER_PREFIX;
+      const headerOpts = options.headerOptions ?? {};
+      const prefix = headerOpts.prefix ?? DEFAULT_HEADER_PREFIX;
       res.setHeader(
-        options.headerOptions.headerName ?? DEFAULT_HEADER_NAME,
+        headerOpts.headerName ?? DEFAULT_HEADER_NAME,
         `${prefix} ${token}`,
       );
     } else if (tokenOptions.storage === 'cookie') {
       const options = tokenOptions as CookieStorageOptions;
-      const { cookieName, ...coreOptions } = options.cookieOptions;
+      const cookieOpts = options.cookieOptions ?? {};
+      const { cookieName, ...coreOptions } = cookieOpts;
       res.cookie(cookieName ?? DEFAULT_ACCESS_COOKIE_NAME, token, {
         ...coreOptions,
       });
@@ -53,8 +55,8 @@ export class TokenService implements TokenStorageDomain {
 
   setRefreshTokenToStorage(res: HttpResponse, token: string): void {
     const refreshTokenOptions = this.getTokenOptions(TokenType.REFRESH);
-    const { cookieName, ...coreOptions } =
-      refreshTokenOptions.cookieOptions as RefreshCookieOptions;
+    const cookieOpts = refreshTokenOptions.cookieOptions ?? {};
+    const { cookieName, ...coreOptions } = cookieOpts;
     res.cookie(cookieName ?? DEFAULT_REFRESH_COOKIE_NAME, token, {
       ...coreOptions,
     });
@@ -81,14 +83,14 @@ export class TokenService implements TokenStorageDomain {
       return token;
     } else if (tokenOptions.storage === 'cookie') {
       const cookieName =
-        tokenOptions.cookieOptions.cookieName || DEFAULT_ACCESS_COOKIE_NAME;
+        tokenOptions?.cookieOptions?.cookieName || DEFAULT_ACCESS_COOKIE_NAME;
       if (!req.cookies) {
         throw new UndefinedCookieRequestError(
           'Cookies do not exist for provided HttpRequest object',
         );
       }
 
-      const token = req.cookies[cookieName];
+      const token = req.cookies[cookieName]?.trim();
 
       if (!token) {
         throw new EmptyCookieError(
@@ -111,7 +113,7 @@ export class TokenService implements TokenStorageDomain {
       );
     }
 
-    const token = req.cookies[cookieName].trim();
+    const token = req.cookies[cookieName]?.trim();
 
     if (!token) {
       throw new EmptyCookieError(
