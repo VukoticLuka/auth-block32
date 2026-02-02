@@ -1,6 +1,6 @@
 {
   "name": "block32-jwt",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A fully typed JWT authentication package for NestJS, inspired by @nestjs/jwt.",
   "author": "Luka Vukotic",
   "license": "MIT",
@@ -10,7 +10,9 @@
     "README.md",
     "index.js",
     "index.d.ts",
-    "LICENSE.md"
+    "LICENSE.md",
+    "lefthook.yml",
+    "tsconfig.build.json"
   ],
   "repository": {
     "type": "git",
