@@ -24,12 +24,8 @@ export type CoreHeaderOptions = {
   prefix: string;
 };
 
-export type RefreshCookieOptions = Omit<
-  CoreCookieOptions,
-  'httpOnly' | 'sameSite'
-> & {
+export type RefreshCookieOptions = Omit<CoreCookieOptions, 'httpOnly'> & {
   httpOnly: true;
-  sameSite: 'strict';
 };
 
 export type HmacAlgorithm = 'HS256' | 'HS384' | 'HS512';
