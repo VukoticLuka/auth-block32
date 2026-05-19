@@ -21,7 +21,6 @@ import {
   UndefinedCookieRequestError,
   WrongAuthHeaderTypeError,
 } from './jwt.errors';
-import { RefreshCookieOptions } from './interfaces/core-options.interface';
 import { TokenStorageDomain } from './domains';
 
 @Injectable()
@@ -66,7 +65,7 @@ export class TokenService implements TokenStorageDomain {
     const tokenOptions = this.getTokenOptions(TokenType.ACCESS);
     if (tokenOptions.storage === 'header') {
       const headerName =
-        tokenOptions.headerOptions.headerName ||
+        tokenOptions?.headerOptions?.headerName ||
         DEFAULT_HEADER_NAME.toLocaleLowerCase();
       const header = req.headers[headerName];
       if (typeof header !== 'string') {
