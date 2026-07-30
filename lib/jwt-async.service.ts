@@ -5,9 +5,11 @@ import {
   CoreTokenOptions,
   JwtBlock32Options,
   RequestType,
+  SignOptions,
   TokenType,
+  VerifyOptions,
 } from './interfaces';
-import { RefreshTokenError, SecretKeyError } from './jwt.errors';
+import { SecretKeyError, TokenOptionsError } from './jwt.errors';
 import * as jwt from 'jsonwebtoken';
 import {
   GetSecretValue,
@@ -26,16 +28,30 @@ export class JwtAsyncService implements JwtAsyncDomain {
 
   signAccessAsync<T extends object | string | Buffer>(
     payload: T,
+    signOptions?: SignOptions,
   ): Promise<string> {
     const options = this.getCoreOptions(TokenType.ACCESS);
-    return this.signAsync(payload, options);
+    return this.signAsync(payload, {
+      ...options,
+      signOptions: {
+        ...options.signOptions,
+        ...signOptions,
+      },
+    });
   }
 
   signRefreshAsync<T extends object | string | Buffer>(
     payload: T,
+    signOptions?: SignOptions,
   ): Promise<string> {
     const options = this.getCoreOptions(TokenType.REFRESH);
-    return this.signAsync(payload, options);
+    return this.signAsync(payload, {
+      ...options,
+      signOptions: {
+        ...options.signOptions,
+        ...signOptions,
+      },
+    });
   }
 
   private async signAsync<T extends object | string | Buffer>(
@@ -65,14 +81,32 @@ export class JwtAsyncService implements JwtAsyncDomain {
     });
   }
 
-  verifyAccessAsync<T extends object>(token: string): Promise<T> {
+  verifyAccessAsync<T extends object>(
+    token: string,
+    verifyOptions?: VerifyOptions,
+  ): Promise<T> {
     const options = this.getCoreOptions(TokenType.ACCESS);
-    return this.verifyAsync(token, options);
+    return this.verifyAsync(token, {
+      ...options,
+      verifyOptions: {
+        ...options.verifyOptions,
+        ...verifyOptions,
+      },
+    });
   }
 
-  verifyRefreshAsync<T extends object>(token: string): Promise<T> {
+  verifyRefreshAsync<T extends object>(
+    token: string,
+    verifyOptions?: VerifyOptions,
+  ): Promise<T> {
     const options = this.getCoreOptions(TokenType.REFRESH);
-    return this.verifyAsync(token, options);
+    return this.verifyAsync(token, {
+      ...options,
+      verifyOptions: {
+        ...options.verifyOptions,
+        ...verifyOptions,
+      },
+    });
   }
 
   private async verifyAsync<T extends object>(
@@ -146,7 +180,7 @@ export class JwtAsyncService implements JwtAsyncDomain {
         : this.jwtOptions.refreshToken;
     if (!options) {
       this.logger.error(`${tokenType} token options are missing`);
-      throw new RefreshTokenError();
+      throw new TokenOptionsError();
     }
     return options;
   }

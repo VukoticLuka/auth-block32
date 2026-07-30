@@ -7,13 +7,15 @@ import {
   JwtBlock32Options,
   KeyOptions,
   RequestType,
+  SignOptions,
   TokenType,
+  VerifyOptions,
 } from './interfaces';
 import * as jwt from 'jsonwebtoken';
 import {
   AsyncSecretOrKeyProviderError,
-  RefreshTokenError,
   SecretKeyError,
+  TokenOptionsError,
 } from './jwt.errors';
 
 @Injectable()
@@ -26,14 +28,32 @@ export class JwtSyncService implements JwtSyncDomain {
     private readonly jwtOptions: JwtBlock32Options,
   ) {}
 
-  signAccessSync<T extends object | string | Buffer>(payload: T): string {
+  signAccessSync<T extends object | string | Buffer>(
+    payload: T,
+    signOptions?: SignOptions,
+  ): string {
     const options = this.getCoreOptions(TokenType.ACCESS);
-    return this.signSync(payload, options);
+    return this.signSync(payload, {
+      ...options,
+      signOptions: {
+        ...options.signOptions,
+        ...signOptions,
+      },
+    });
   }
 
-  signRefreshSync<T extends object | string | Buffer>(payload: T): string {
+  signRefreshSync<T extends object | string | Buffer>(
+    payload: T,
+    signOptions?: SignOptions,
+  ): string {
     const options = this.getCoreOptions(TokenType.REFRESH);
-    return this.signSync(payload, options);
+    return this.signSync(payload, {
+      ...options,
+      signOptions: {
+        ...options.signOptions,
+        ...signOptions,
+      },
+    });
   }
 
   private signSync<T extends object | string | Buffer>(
@@ -44,7 +64,7 @@ export class JwtSyncService implements JwtSyncDomain {
       options.keyOptions,
       payload,
       RequestType.SIGN,
-      options.signOptions || {},
+      options.signOptions ?? {},
     );
 
     if (secret instanceof Promise) {
@@ -62,14 +82,32 @@ export class JwtSyncService implements JwtSyncDomain {
     });
   }
 
-  verifyAccessSync<T extends object>(token: string): T {
+  verifyAccessSync<T extends object>(
+    token: string,
+    verifyOptions?: VerifyOptions,
+  ): T {
     const options = this.getCoreOptions(TokenType.ACCESS);
-    return this.verifySync(token, options);
+    return this.verifySync(token, {
+      ...options,
+      verifyOptions: {
+        ...options.verifyOptions,
+        ...verifyOptions,
+      },
+    });
   }
 
-  verifyRefreshSync<T extends object>(token: string): T {
+  verifyRefreshSync<T extends object>(
+    token: string,
+    verifyOptions?: VerifyOptions,
+  ): T {
     const options = this.getCoreOptions(TokenType.REFRESH);
-    return this.verifySync(token, options);
+    return this.verifySync(token, {
+      ...options,
+      verifyOptions: {
+        ...options.verifyOptions,
+        ...verifyOptions,
+      },
+    });
   }
 
   private verifySync<T extends object>(
@@ -80,7 +118,7 @@ export class JwtSyncService implements JwtSyncDomain {
       options.keyOptions,
       token,
       RequestType.VERIFY,
-      options.verifyOptions || {},
+      options.verifyOptions ?? {},
     );
 
     if (secret instanceof Promise) {
@@ -141,7 +179,7 @@ export class JwtSyncService implements JwtSyncDomain {
         : this.jwtOptions.refreshToken;
     if (!options) {
       this.logger.error(`${tokenType} token options are missing`);
-      throw new RefreshTokenError();
+      throw new TokenOptionsError();
     }
     return options;
   }

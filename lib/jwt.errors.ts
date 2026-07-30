@@ -6,3 +6,8 @@ export class AsyncSecretOrKeyProviderError extends Error {}
 export class WrongAuthHeaderTypeError extends Error {}
 export class UndefinedCookieRequestError extends Error {}
 export class EmptyCookieError extends Error {}
+export class TokenOptionsError extends Error {
+  constructor() {
+    super('Token options are missing');
+  }
+}
